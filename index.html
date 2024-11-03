@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Квиз</title>
+    <style>
+        /* Простой CSS для оформления */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .quiz-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        .question {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .options button {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #e0e0e0;
+        }
+        .options button:hover {
+            background-color: #d0d0d0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="question" id="question">Загрузка вопроса...</div>
+    <div class="options" id="options">
+        <!-- Варианты ответов будут здесь -->
+    </div>
+</div>
+
+<script>
+    // Функция для загрузки данных квиза с API
+    async function loadQuiz() {
+        try {
+            // Пример URL API (замените на ваш реальный API)
+            const response = await fetch('http://localhost:8080/questions/1');
+            
+            // Парсинг JSON ответа от сервера
+            const data = await response.json();
+
+            // Отображение вопроса
+            document.getElementById('question').textContent = data.question;
+
+            // Очистка предыдущих вариантов
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+
+            // Создание кнопок для каждого варианта ответа
+            const options = [data.answerOptionOne, data.answerOptionTwo, data.answerOptionThree, data.answerOptionFour];
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.onclick = () => selectAnswer(option, data.answer); // Проверка ответа с помощью data.answer
+                optionsContainer.appendChild(button);
+            });
+        } catch (error) {
+            console.error("Ошибка загрузки данных квиза:", error);
+            document.getElementById('question').textContent = "Не удалось загрузить вопрос. Попробуйте снова.";
+        }
+    }
+
+    // Функция для обработки выбора ответа
+    function selectAnswer(selectedOption, correctAnswer) {
+        if (selectedOption === correctAnswer) {
+            alert("Правильно!");
+        } else {
+            alert("Неправильно. Попробуйте снова!");
+        }
+        
+        // Загрузить следующий вопрос после ответа
+        loadQuiz();
+    }
+
+    // Загрузка первого вопроса при загрузке страницы
+    loadQuiz();
+</script>
+
+</body>
+</html>
